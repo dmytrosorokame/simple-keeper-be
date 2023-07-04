@@ -1,73 +1,66 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Simple.Keeper
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Simple.Keeper is an expense tracking application built with Nest.js. It allows users to track their expenses and manage their financial activities effectively.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Tech Stack
 
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- Framework: Nest.js
+- Database: Postgres (in Docker)
+- ORM: Prisma
+- Authentication: JWT (JSON Web Tokens), access tokens, refresh tokens
+- Docker Compose for containerization
+- Continuous Integration/Continuous Deployment (CI/CD)
+- Code Quality Tools: ESLint, Husky, Prettier, Commitlint, GitHub Actions
+- Node Version Manager (nvm)
+- Testing: Jest
 
 ## Installation
 
-```bash
-$ npm install
+1. Clone the repository.
+2. Install the dependencies using the following command:
+
+```shell
+npm install
 ```
 
-## Running the app
+3. Create a `.env` file in the project root directory and provide the required environment variables. (Look to the `.env.example` file for reference.)
 
-```bash
-# development
-$ npm run start
+## Usage
 
-# watch mode
-$ npm run start:dev
+To start the application, run the following command:
 
-# production mode
-$ npm run start:prod
+```shell
+npm run start:dev
 ```
 
-## Test
+The application will start in development mode and automatically restart when changes are detected.
 
-```bash
-# unit tests
-$ npm run test
+## Commands
 
-# e2e tests
-$ npm run test:e2e
+- `build`: Builds the Nest.js application.
+- `format`: Formats the source code using Prettier.
+- `start`: Starts the Nest.js application.
+- `start:dev`: Starts the Nest.js application in development mode with watch mode enabled.
+- `start:debug`: Starts the Nest.js application in debug mode with watch mode enabled.
+- `start:prod`: Starts the compiled application in production mode.
+- `lint`: Lints the code using ESLint.
+- `lint:fix`: Fixes linting issues automatically.
+- `test`: Runs Jest tests.
+- `test:watch`: Runs Jest tests in watch mode.
+- `test:cov`: Runs Jest tests with coverage reporting.
+- `test:debug`: Runs Jest tests in debug mode.
+- `test:e2e`: Runs end-to-end (e2e) tests using Jest.
 
-# test coverage
-$ npm run test:cov
-```
+## Contributing
 
-## Support
+Contributions are welcome! To contribute to Simple.Keeper, follow these steps:
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+1. Fork the repository.
+2. Create a new branch.
+3. Make your changes and commit them.
+4. Push the changes to your fork.
+5. Submit a pull request.
 
 ## License
 
-Nest is [MIT licensed](LICENSE).
+This project is licensed under the [MIT License](LICENSE).
