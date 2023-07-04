@@ -5,11 +5,12 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private jwt: JwtService) {}
 
   async signUp({ email, password }) {
     const user = await this.prisma.user.findUnique({
@@ -53,8 +54,10 @@ export class AuthService {
       throw new BadRequestException('Wrong password');
     }
 
-    delete user.password;
+    const payload = { sub: user.id, email: user.email };
 
-    return user;
+    return {
+      access_token: await this.jwt.signAsync(payload),
+    };
   }
 }
