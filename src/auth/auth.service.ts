@@ -1,5 +1,10 @@
 import { PrismaService } from './../prisma.service';
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -29,5 +34,27 @@ export class AuthService {
     delete createdUser.password;
 
     return createdUser;
+  }
+
+  async login({ email, password }) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatch) {
+      throw new BadRequestException('Wrong password');
+    }
+
+    delete user.password;
+
+    return user;
   }
 }
