@@ -1,4 +1,3 @@
-import { PrismaService } from './../prisma.service';
 import {
   BadRequestException,
   ConflictException,
@@ -8,11 +7,17 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
+import { PrismaService } from './../prisma.service';
+import { AuthDto } from './dto/auth.dto';
+
 @Injectable()
 export class AuthService {
   constructor(private prisma: PrismaService, private jwt: JwtService) {}
 
-  async signUp({ email, password }) {
+  async signUp({
+    email,
+    password,
+  }: AuthDto): Promise<{ email: string; userId: number }> {
     const user = await this.prisma.user.findUnique({
       where: {
         email,
@@ -32,12 +37,10 @@ export class AuthService {
       },
     });
 
-    delete createdUser.password;
-
-    return createdUser;
+    return { email: createdUser.email, userId: createdUser.id };
   }
 
-  async login({ email, password }) {
+  async login({ email, password }: AuthDto): Promise<{ access_token: string }> {
     const user = await this.prisma.user.findUnique({
       where: {
         email,

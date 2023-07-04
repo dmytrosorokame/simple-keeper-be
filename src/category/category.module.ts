@@ -1,8 +1,9 @@
-import { PrismaService } from './../prisma.service';
 import { Module } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+
+import { PrismaService } from './../prisma.service';
 import { CategoryController } from './category.controller';
 import { CategoryService } from './category.service';
-import { JwtService } from '@nestjs/jwt';
 
 @Module({
   controllers: [CategoryController],
