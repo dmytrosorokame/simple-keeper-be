@@ -5,10 +5,17 @@ import { AuthModule } from './auth/auth.module';
 import { PrismaService } from './prisma.service';
 import { CategoryModule } from './category/category.module';
 import { ExpenseModule } from './expense/expense.module';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [AuthModule, CategoryModule, ExpenseModule],
   controllers: [AppController],
   providers: [AppService, PrismaService],
 })
-export class AppModule {}
+export class AppModule {
+  static port: string;
+
+  constructor(configService: ConfigService) {
+    AppModule.port = configService.get<string>('PORT');
+  }
+}
