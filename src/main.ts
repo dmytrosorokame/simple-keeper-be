@@ -8,6 +8,8 @@ import { swaggerOptions } from './utils/swagger.utils';
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
 
+  app.enableCors();
+
   const document = SwaggerModule.createDocument(app, swaggerOptions);
 
   SwaggerModule.setup('api', app, document);
