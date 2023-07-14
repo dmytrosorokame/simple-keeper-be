@@ -12,12 +12,12 @@ import {
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 
-import { AuthGuard } from './../auth/auth.guard';
+import { AccessTokenGuard } from './../auth/guards/accessToken.guard';
 import { SwaggerApiTag } from './../utils/swagger.utils';
 import { CategoryService } from './category.service';
 import { Category, CreateCategoryDto } from './dto/category.dto';
 
-@UseGuards(AuthGuard)
+@UseGuards(AccessTokenGuard)
 @ApiBearerAuth()
 @ApiTags(SwaggerApiTag.CATEGORIES)
 @Controller('category')

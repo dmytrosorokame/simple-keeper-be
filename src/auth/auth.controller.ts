@@ -1,24 +1,47 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Request } from 'express';
 
 import { SwaggerApiTag } from './../utils/swagger.utils';
 import { AuthService } from './auth.service';
-import { AuthDto, LoginResponse, SignUpResponse } from './dto/auth.dto';
+import { AuthDto, AuthResponse } from './dto/auth.dto';
+import { AccessTokenGuard } from './guards/accessToken.guard';
+import { RefreshTokenGuard } from './guards/refreshToken.guard';
 
 @Controller('auth')
 @ApiTags(SwaggerApiTag.AUTH)
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @ApiResponse({ type: SignUpResponse })
+  @ApiResponse({ type: AuthResponse })
   @Post('sign-up')
-  async signUp(@Body() dto: AuthDto): Promise<SignUpResponse> {
+  async signUp(@Body() dto: AuthDto): Promise<AuthResponse> {
     return this.authService.signUp(dto);
   }
 
-  @ApiResponse({ type: LoginResponse })
+  @ApiResponse({ type: AuthResponse })
   @Post('login')
-  async login(@Body() dto: AuthDto): Promise<LoginResponse> {
+  async login(@Body() dto: AuthDto): Promise<AuthResponse> {
     return this.authService.login(dto);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AccessTokenGuard)
+  @Get('logout')
+  logout(@Req() req: Request): Promise<void> {
+    const userId = req['user']['sub'] as number;
+
+    return this.authService.logout(userId);
+  }
+
+  @ApiResponse({ type: AuthResponse })
+  @ApiBearerAuth()
+  @UseGuards(RefreshTokenGuard)
+  @Get('refresh')
+  refreshTokens(@Req() req: Request): Promise<AuthResponse> {
+    const userId = req['user']['sub'] as number;
+    const refreshToken = req['user']['refreshToken'] as string;
+
+    return this.authService.refreshTokens(userId, refreshToken);
   }
 }

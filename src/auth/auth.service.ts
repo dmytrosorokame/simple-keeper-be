@@ -1,24 +1,26 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
-  NotFoundException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
+import * as argon2 from 'argon2';
 
 import { PrismaService } from './../prisma.service';
-import { AuthDto } from './dto/auth.dto';
+import { AuthDto, AuthResponse } from './dto/auth.dto';
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService, private jwt: JwtService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private jwtService: JwtService,
+    private configService: ConfigService,
+  ) {}
 
-  async signUp({
-    email,
-    password,
-  }: AuthDto): Promise<{ email: string; userId: number }> {
-    const user = await this.prisma.user.findUnique({
+  async signUp({ password, email }: AuthDto): Promise<AuthResponse> {
+    const user = await this.prismaService.user.findUnique({
       where: {
         email,
       },
@@ -28,39 +30,133 @@ export class AuthService {
       throw new ConflictException('User already exists');
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const createdUser = await this.prisma.user.create({
+    const hashedPassword = await this.hashData(password);
+    const newUser = await this.prismaService.user.create({
       data: {
         email,
         password: hashedPassword,
       },
     });
 
-    return { email: createdUser.email, userId: createdUser.id };
+    const tokens = await this.getTokens(newUser.id, newUser.email);
+
+    await this.updateRefreshToken(newUser.id, tokens.refreshToken);
+
+    return tokens;
   }
 
-  async login({ email, password }: AuthDto): Promise<{ access_token: string }> {
-    const user = await this.prisma.user.findUnique({
+  async login({ email, password }: AuthDto): Promise<AuthResponse> {
+    const user = await this.prismaService.user.findUnique({
       where: {
         email,
       },
     });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new BadRequestException('User does not exist');
     }
 
-    const passwordMatch = await bcrypt.compare(password, user.password);
+    const passwordMatches = await argon2.verify(user.password, password);
 
-    if (!passwordMatch) {
-      throw new BadRequestException('Wrong password');
+    if (!passwordMatches) {
+      throw new BadRequestException('Password is incorrect');
     }
 
-    const payload = { sub: user.id, email: user.email };
+    const tokens = await this.getTokens(user.id, user.email);
+
+    await this.updateRefreshToken(user.id, tokens.refreshToken);
+
+    return tokens;
+  }
+
+  async logout(userId: number): Promise<void> {
+    await this.prismaService.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        refreshToken: null,
+      },
+    });
+  }
+
+  async refreshTokens(
+    userId: number,
+    refreshToken: string,
+  ): Promise<AuthResponse> {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user?.refreshToken) {
+      throw new ForbiddenException('Access Denied');
+    }
+
+    const refreshTokenMatches = await argon2.verify(
+      user.refreshToken,
+      refreshToken,
+    );
+
+    if (!refreshTokenMatches) {
+      throw new ForbiddenException('Access Denied');
+    }
+
+    const tokens = await this.getTokens(user.id, user.email);
+
+    await this.updateRefreshToken(user.id, tokens.refreshToken);
+
+    return tokens;
+  }
+
+  hashData(data: string): Promise<string> {
+    return argon2.hash(data);
+  }
+
+  async updateRefreshToken(
+    userId: number,
+    refreshToken: string,
+  ): Promise<void> {
+    const hashedRefreshToken = await this.hashData(refreshToken);
+
+    await this.prismaService.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        refreshToken: hashedRefreshToken,
+      },
+    });
+  }
+
+  async getTokens(userId: number, email: string): Promise<AuthResponse> {
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(
+        {
+          sub: userId,
+          email,
+        },
+        {
+          secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+          expiresIn: this.configService.get<string>('JWT_ACCESS_EXPIRATION'),
+        },
+      ),
+      this.jwtService.signAsync(
+        {
+          sub: userId,
+          email,
+        },
+        {
+          secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+          expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRATION'),
+        },
+      ),
+    ]);
 
     return {
-      access_token: await this.jwt.signAsync(payload),
+      accessToken,
+      refreshToken,
     };
   }
 }

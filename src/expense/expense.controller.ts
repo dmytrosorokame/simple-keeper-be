@@ -12,15 +12,15 @@ import {
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 
-import { AuthGuard } from './../auth/auth.guard';
+import { AccessTokenGuard } from './../auth/guards/accessToken.guard';
 import { SwaggerApiTag } from './../utils/swagger.utils';
 import { CreateExpenseDto, Expense } from './dto/expense.dto';
 import { ExpenseService } from './expense.service';
 
-@UseGuards(AuthGuard)
+@UseGuards(AccessTokenGuard)
 @ApiBearerAuth()
 @ApiTags(SwaggerApiTag.EXPENSES)
-@Controller('expense')
+@Controller('expenses')
 export class ExpenseController {
   constructor(private expenseService: ExpenseService) {}
 

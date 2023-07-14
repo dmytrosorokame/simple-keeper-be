@@ -17,25 +17,16 @@ export class AuthDto {
   @MinLength(8)
   password: string;
 }
-
-export class SignUpResponse {
-  @ApiProperty({
-    type: String,
-    description: 'User email',
-  })
-  email: string;
-
-  @ApiProperty({
-    type: Number,
-    description: 'User id',
-  })
-  userId: number;
-}
-
-export class LoginResponse {
+export class AuthResponse {
   @ApiProperty({
     type: String,
     description: 'Access token',
   })
-  access_token: string;
+  accessToken: string;
+
+  @ApiProperty({
+    type: String,
+    description: 'Refresh token',
+  })
+  refreshToken: string;
 }
