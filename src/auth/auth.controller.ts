@@ -8,8 +8,8 @@ import { AuthDto, AuthResponse } from './dto/auth.dto';
 import { AccessTokenGuard } from './guards/accessToken.guard';
 import { RefreshTokenGuard } from './guards/refreshToken.guard';
 
-@Controller('auth')
 @ApiTags(SwaggerApiTag.AUTH)
+@Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 

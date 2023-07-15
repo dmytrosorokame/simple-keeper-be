@@ -10,4 +10,5 @@ export enum SwaggerApiTag {
   EXPENSES = 'Expenses',
   CATEGORIES = 'Categories',
   AUTH = 'Auth',
+  USERS = 'Users',
 }
