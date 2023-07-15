@@ -8,35 +8,26 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 
-import { PrismaService } from './../prisma.service';
+import { UserService } from './../user/user.service';
 import { AuthDto, AuthResponse } from './dto/auth.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private prismaService: PrismaService,
+    private userService: UserService,
     private jwtService: JwtService,
     private configService: ConfigService,
   ) {}
 
   async signUp({ password, email }: AuthDto): Promise<AuthResponse> {
-    const user = await this.prismaService.user.findUnique({
-      where: {
-        email,
-      },
-    });
+    const user = await this.userService.findByEmail(email);
 
     if (user) {
       throw new ConflictException('User already exists');
     }
 
     const hashedPassword = await this.hashData(password);
-    const newUser = await this.prismaService.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-      },
-    });
+    const newUser = await this.userService.create(email, hashedPassword);
 
     const tokens = await this.getTokens(newUser.id, newUser.email);
 
@@ -46,11 +37,7 @@ export class AuthService {
   }
 
   async login({ email, password }: AuthDto): Promise<AuthResponse> {
-    const user = await this.prismaService.user.findUnique({
-      where: {
-        email,
-      },
-    });
+    const user = await this.userService.findByEmail(email);
 
     if (!user) {
       throw new BadRequestException('User does not exist');
@@ -70,13 +57,8 @@ export class AuthService {
   }
 
   async logout(userId: number): Promise<void> {
-    await this.prismaService.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        refreshToken: null,
-      },
+    await this.userService.update(userId, {
+      refreshToken: null,
     });
   }
 
@@ -84,11 +66,7 @@ export class AuthService {
     userId: number,
     refreshToken: string,
   ): Promise<AuthResponse> {
-    const user = await this.prismaService.user.findUnique({
-      where: {
-        id: userId,
-      },
-    });
+    const user = await this.userService.findById(userId);
 
     if (!user?.refreshToken) {
       throw new ForbiddenException('Access Denied');
@@ -120,13 +98,8 @@ export class AuthService {
   ): Promise<void> {
     const hashedRefreshToken = await this.hashData(refreshToken);
 
-    await this.prismaService.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        refreshToken: hashedRefreshToken,
-      },
+    await this.userService.update(userId, {
+      refreshToken: hashedRefreshToken,
     });
   }
 
