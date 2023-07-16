@@ -26,19 +26,16 @@ export class ExpenseController {
 
   @ApiResponse({ type: Expense })
   @Post()
-  create(
-    @Body() dto: CreateExpenseDto,
-    @Req() request: Request,
-  ): Promise<Expense> {
-    const userId = request['userId'] as number;
+  create(@Body() dto: CreateExpenseDto, @Req() req: Request): Promise<Expense> {
+    const userId = req['user']['sub'] as number;
 
     return this.expenseService.create({ ...dto, userId });
   }
 
   @ApiResponse({ type: Expense, isArray: true })
   @Get()
-  getAllByUserId(@Req() request: Request): Promise<Expense[]> {
-    const userId = request['userId'] as number;
+  getAllByUserId(@Req() req: Request): Promise<Expense[]> {
+    const userId = req['user']['sub'] as number;
 
     return this.expenseService.getAllByUserId(userId);
   }

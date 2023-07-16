@@ -28,17 +28,17 @@ export class CategoryController {
   @Post()
   async create(
     @Body() createCategoryDto: CreateCategoryDto,
-    @Req() request: Request,
+    @Req() req: Request,
   ): Promise<Category> {
-    const userId = request['userId'] as number;
+    const userId = req['user']['sub'] as number;
 
     return this.categoryService.create(createCategoryDto.name, userId);
   }
 
   @ApiResponse({ type: Category, isArray: true })
   @Get()
-  async getAllByUserId(@Req() request: Request): Promise<Category[]> {
-    const userId = request['userId'] as number;
+  async getAllByUserId(@Req() req: Request): Promise<Category[]> {
+    const userId = req['user']['sub'] as number;
 
     return this.categoryService.getAllByUserId(userId);
   }
