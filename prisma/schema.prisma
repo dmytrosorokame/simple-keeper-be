@@ -28,13 +28,13 @@ model Category {
 }
 
 model Expense {
-  id         Int      @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   amount     Float
   name       String?
   comment    String?
-  createdAt  DateTime @default(now())
-  categoryId Int
-  category   Category @relation(fields: [categoryId], references: [id])
+  createdAt  DateTime  @default(now())
+  categoryId Int?
+  category   Category? @relation(fields: [categoryId], references: [id])
   userId     Int
-  user       User     @relation(fields: [userId], references: [id])
+  user       User      @relation(fields: [userId], references: [id])
 }

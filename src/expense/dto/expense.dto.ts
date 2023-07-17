@@ -14,8 +14,9 @@ export class CreateExpenseDto {
     type: Number,
     description: 'Expense category id',
   })
+  @IsOptional()
   @IsNumber()
-  categoryId: number;
+  categoryId?: number;
 
   @ApiPropertyOptional({
     type: String,
@@ -50,7 +51,7 @@ export class Expense implements PrismaExpense {
     type: Number,
     description: 'Expense category id',
   })
-  categoryId: number;
+  categoryId: number | null;
 
   @ApiPropertyOptional({
     type: String,
