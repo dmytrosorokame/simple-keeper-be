@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { PrismaService } from './../prisma.service';
 import { CreateExpenseDto, Expense } from './dto/expense.dto';
@@ -18,6 +18,18 @@ export class ExpenseService {
       where: { userId },
       include: { category: true },
     });
+  }
+
+  async getById(id: number, userId: number): Promise<Expense> {
+    const expense = await this.prisma.expense.findUnique({
+      where: { id, userId },
+    });
+
+    if (!expense) {
+      throw new NotFoundException('Expense not found');
+    }
+
+    return expense;
   }
 
   async delete(id: number): Promise<Expense> {

@@ -41,6 +41,17 @@ export class ExpenseController {
   }
 
   @ApiResponse({ type: Expense })
+  @Get(':id')
+  getById(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: Request,
+  ): Promise<Expense> {
+    const userId = req['user']['sub'] as number;
+
+    return this.expenseService.getById(id, userId);
+  }
+
+  @ApiResponse({ type: Expense })
   @Delete(':id')
   delete(@Param('id', ParseIntPipe) id: number): Promise<Expense> {
     return this.expenseService.delete(id);
