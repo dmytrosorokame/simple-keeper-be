@@ -22,10 +22,10 @@ export class ExpenseService {
 
   async getById(id: number, userId: number): Promise<Expense> {
     const expense = await this.prisma.expense.findUnique({
-      where: { id, userId },
+      where: { id },
     });
 
-    if (!expense) {
+    if (!expense || expense.userId !== userId) {
       throw new NotFoundException('Expense not found');
     }
 
