@@ -1,10 +1,23 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Patch,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 
 import { SwaggerApiTag } from './../utils/swagger.utils';
 import { AuthService } from './auth.service';
-import { AuthDto, AuthResponse } from './dto/auth.dto';
+import {
+  AuthDto,
+  AuthResponse,
+  ResetPasswordDto,
+  ResetPasswordResponse,
+} from './dto/auth.dto';
 import { AccessTokenGuard } from './guards/accessToken.guard';
 import { RefreshTokenGuard } from './guards/refreshToken.guard';
 
@@ -43,5 +56,11 @@ export class AuthController {
     const refreshToken = req['user']['refreshToken'] as string;
 
     return this.authService.refreshTokens(userId, refreshToken);
+  }
+
+  @ApiResponse({ type: ResetPasswordResponse })
+  @Patch('reset-password')
+  resetPassword(@Body() dto: ResetPasswordDto): Promise<ResetPasswordResponse> {
+    return this.authService.resetPassword(dto.email);
   }
 }

@@ -6,10 +6,12 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { MailerService } from '@nestjs-modules/mailer';
 import * as argon2 from 'argon2';
 
 import { UserService } from './../user/user.service';
-import { AuthDto, AuthResponse } from './dto/auth.dto';
+import { generatePassword } from './../utils/generate-password.utils';
+import { AuthDto, AuthResponse, ResetPasswordResponse } from './dto/auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +19,7 @@ export class AuthService {
     private userService: UserService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private mailerService: MailerService,
   ) {}
 
   async signUp({ password, email }: AuthDto): Promise<AuthResponse> {
@@ -59,6 +62,44 @@ export class AuthService {
   async logout(userId: number): Promise<void> {
     await this.userService.update(userId, {
       refreshToken: null,
+    });
+  }
+
+  async resetPassword(email: string): Promise<ResetPasswordResponse> {
+    const user = await this.userService.findByEmail(email);
+
+    if (!user) {
+      throw new BadRequestException('User does not exist');
+    }
+
+    const newPassword = generatePassword();
+
+    const hashedPassword = await this.hashData(newPassword);
+
+    try {
+      await this.sendResetPasswordEmail(email, newPassword);
+
+      await this.userService.update(user.id, {
+        password: hashedPassword,
+      });
+
+      return {
+        message: 'Password has been reset',
+      };
+    } catch (error) {
+      throw new BadRequestException('Password has not been reset');
+    }
+  }
+
+  sendResetPasswordEmail(email: string, password: string): Promise<void> {
+    return this.mailerService.sendMail({
+      to: email,
+      subject: 'Reset password',
+      html: `
+        <h3>Hi there!</h3>
+
+        <p>Your new password is: <b>${password}</b></p>
+      `,
     });
   }
 

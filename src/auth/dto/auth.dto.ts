@@ -30,3 +30,20 @@ export class AuthResponse {
   })
   refreshToken: string;
 }
+
+export class ResetPasswordDto {
+  @ApiProperty({
+    type: String,
+    description: 'User email',
+  })
+  @IsEmail()
+  email: string;
+}
+
+export class ResetPasswordResponse {
+  @ApiProperty({
+    type: String,
+    description: 'Message',
+  })
+  message: string;
+}
