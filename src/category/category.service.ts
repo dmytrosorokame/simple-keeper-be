@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { PrismaService } from './../prisma.service';
 import { Category } from './dto/category.dto';
@@ -19,7 +23,21 @@ export class CategoryService {
     });
   }
 
-  async delete(id: number): Promise<Category> {
+  async delete(id: number, userId: number): Promise<Category> {
+    const category = await this.prisma.category.findUnique({
+      where: { id },
+    });
+
+    if (!category) {
+      throw new NotFoundException('Category not found');
+    }
+
+    if (category.userId !== userId) {
+      throw new ForbiddenException(
+        'You are not allowed to delete this category',
+      );
+    }
+
     return this.prisma.category.delete({ where: { id } });
   }
 }

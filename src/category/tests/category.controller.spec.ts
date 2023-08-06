@@ -92,11 +92,18 @@ describe('CategoryController', () => {
       let category: Category;
 
       beforeEach(async () => {
-        category = await categoryController.delete(categoryStub().id);
+        const req = createRequest();
+
+        req.user = { sub: categoryStub().userId };
+
+        category = await categoryController.delete(categoryStub().id, req);
       });
 
       test('then it should call categoryService', () => {
-        expect(categoryService.delete).toBeCalledWith(categoryStub().id);
+        expect(categoryService.delete).toBeCalledWith(
+          categoryStub().id,
+          categoryStub().userId,
+        );
       });
 
       test('then it should return a category', () => {

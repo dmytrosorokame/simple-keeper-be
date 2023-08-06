@@ -45,7 +45,12 @@ export class CategoryController {
 
   @ApiResponse({ type: Category })
   @Delete(':id')
-  async delete(@Param('id', ParseIntPipe) id: number): Promise<Category> {
-    return this.categoryService.delete(id);
+  async delete(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: Request,
+  ): Promise<Category> {
+    const userId = req['user']['sub'] as number;
+
+    return this.categoryService.delete(id, userId);
   }
 }
