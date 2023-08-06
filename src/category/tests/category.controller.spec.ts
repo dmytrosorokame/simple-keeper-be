@@ -82,4 +82,22 @@ describe('CategoryController', () => {
       });
     });
   });
+
+  describe('delete', () => {
+    describe('when delete is called', () => {
+      let category: Category;
+
+      beforeEach(async () => {
+        category = await categoryController.delete(categoryStub().id);
+      });
+
+      test('then it should call categoryService', () => {
+        expect(categoryService.delete).toBeCalledWith(categoryStub().id);
+      });
+
+      test('then it should return a category', () => {
+        expect(category).toEqual(categoryStub());
+      });
+    });
+  });
 });
