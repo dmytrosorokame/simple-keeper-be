@@ -3,7 +3,7 @@ import { createRequest } from 'node-mocks-http';
 
 import { CategoryController } from '../category.controller';
 import { CategoryService } from '../category.service';
-import { Category } from '../dto/category.dto';
+import { Category, CreateCategoryDto } from '../dto/category.dto';
 
 import { categoryStub } from './stubs/category.stub';
 
@@ -49,6 +49,36 @@ describe('CategoryController', () => {
 
       test('then categories should relate to user', () => {
         expect(categories[0].userId).toEqual(categoryStub().userId);
+      });
+    });
+  });
+
+  describe('create', () => {
+    describe('when create is called', () => {
+      let category: Category;
+      let createCategoryDto: CreateCategoryDto;
+
+      beforeEach(async () => {
+        createCategoryDto = {
+          name: categoryStub().name,
+        };
+
+        const req = createRequest();
+
+        req.user = { sub: categoryStub().userId };
+
+        category = await categoryController.create(createCategoryDto, req);
+      });
+
+      test('then it should call categoryService', () => {
+        expect(categoryService.create).toBeCalledWith(
+          createCategoryDto.name,
+          categoryStub().userId,
+        );
+      });
+
+      test('then it should return a category', () => {
+        expect(category).toEqual(categoryStub());
       });
     });
   });
