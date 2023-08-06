@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { PrismaService } from './../prisma.service';
 import { CreateExpenseDto, Expense } from './dto/expense.dto';
@@ -32,7 +36,21 @@ export class ExpenseService {
     return expense;
   }
 
-  async delete(id: number): Promise<Expense> {
+  async delete(id: number, userId: number): Promise<Expense> {
+    const expense = await this.prisma.expense.findUnique({
+      where: { id },
+    });
+
+    if (!expense) {
+      throw new NotFoundException('Expense not found');
+    }
+
+    if (expense.userId !== userId) {
+      throw new ForbiddenException(
+        'You are not allowed to delete this expense',
+      );
+    }
+
     return this.prisma.expense.delete({ where: { id } });
   }
 }

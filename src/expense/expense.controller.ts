@@ -53,7 +53,12 @@ export class ExpenseController {
 
   @ApiResponse({ type: Expense })
   @Delete(':id')
-  delete(@Param('id', ParseIntPipe) id: number): Promise<Expense> {
-    return this.expenseService.delete(id);
+  delete(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: Request,
+  ): Promise<Expense> {
+    const userId = req['user']['sub'] as number;
+
+    return this.expenseService.delete(id, userId);
   }
 }

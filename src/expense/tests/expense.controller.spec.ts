@@ -110,4 +110,31 @@ describe('ExpenseController', () => {
       expect(expense.userId).toEqual(expenseStub().userId);
     });
   });
+
+  describe('when delete is called', () => {
+    let expense: Expense;
+
+    beforeEach(async () => {
+      const req = createRequest();
+
+      req.user = { sub: expenseStub().userId };
+
+      expense = await expenseController.delete(expenseStub().id, req);
+    });
+
+    test('then it should call expenseService', () => {
+      expect(expenseService.delete).toBeCalledWith(
+        expenseStub().id,
+        expenseStub().userId,
+      );
+    });
+
+    test('then it should return a deleted expense', () => {
+      expect(expense).toEqual(expenseStub());
+    });
+
+    test('then deleted expense should relate to user', () => {
+      expect(expense.userId).toEqual(expenseStub().userId);
+    });
+  });
 });
