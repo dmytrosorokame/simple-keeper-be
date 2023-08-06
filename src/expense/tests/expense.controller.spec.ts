@@ -13,6 +13,39 @@ describe('ExpenseController', () => {
   let expenseController: ExpenseController;
   let expenseService: ExpenseService;
 
+  describe('when create is called', () => {
+    let expense: Expense;
+    let createExpenseDto: CreateExpenseDto;
+
+    beforeEach(async () => {
+      createExpenseDto = {
+        amount: expenseStub().amount,
+        categoryId: expenseStub().categoryId,
+      };
+
+      const req = createRequest();
+
+      req.user = { sub: expenseStub().userId };
+
+      expense = await expenseController.create(createExpenseDto, req);
+    });
+
+    test('then it should call expenseService', () => {
+      expect(expenseService.create).toBeCalledWith({
+        ...createExpenseDto,
+        userId: expenseStub().userId,
+      });
+    });
+
+    test('then it should return a expense', () => {
+      expect(expense).toEqual(expenseStub());
+    });
+
+    test('then expense should relate to user', () => {
+      expect(expense.userId).toEqual(expenseStub().userId);
+    });
+  });
+
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [],
@@ -51,28 +84,22 @@ describe('ExpenseController', () => {
     });
   });
 
-  describe('when create is called', () => {
+  describe('when getById is called', () => {
     let expense: Expense;
-    let createExpenseDto: CreateExpenseDto;
 
     beforeEach(async () => {
-      createExpenseDto = {
-        amount: expenseStub().amount,
-        categoryId: expenseStub().categoryId,
-      };
-
       const req = createRequest();
 
       req.user = { sub: expenseStub().userId };
 
-      expense = await expenseController.create(createExpenseDto, req);
+      expense = await expenseController.getById(expenseStub().id, req);
     });
 
     test('then it should call expenseService', () => {
-      expect(expenseService.create).toBeCalledWith({
-        ...createExpenseDto,
-        userId: expenseStub().userId,
-      });
+      expect(expenseService.getById).toBeCalledWith(
+        expenseStub().id,
+        expenseStub().userId,
+      );
     });
 
     test('then it should return a expense', () => {
