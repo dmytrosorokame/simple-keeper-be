@@ -80,6 +80,10 @@ describe('CategoryController', () => {
       test('then it should return a category', () => {
         expect(category).toEqual(categoryStub());
       });
+
+      test('then category should relate to user', () => {
+        expect(category.userId).toEqual(categoryStub().userId);
+      });
     });
   });
 
@@ -97,6 +101,10 @@ describe('CategoryController', () => {
 
       test('then it should return a category', () => {
         expect(category).toEqual(categoryStub());
+      });
+
+      test('then category should relate to user', () => {
+        expect(category.userId).toEqual(categoryStub().userId);
       });
     });
   });

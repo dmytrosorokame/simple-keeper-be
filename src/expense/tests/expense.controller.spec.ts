@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing';
 import { createRequest } from 'node-mocks-http';
 
-import { Expense } from '../dto/expense.dto';
+import { CreateExpenseDto, Expense } from '../dto/expense.dto';
 import { ExpenseController } from '../expense.controller';
 import { ExpenseService } from '../expense.service';
 
@@ -48,6 +48,39 @@ describe('ExpenseController', () => {
 
     test('then expenses should relate to user', () => {
       expect(expenses[0].userId).toEqual(expenseStub().userId);
+    });
+  });
+
+  describe('when create is called', () => {
+    let expense: Expense;
+    let createExpenseDto: CreateExpenseDto;
+
+    beforeEach(async () => {
+      createExpenseDto = {
+        amount: expenseStub().amount,
+        categoryId: expenseStub().categoryId,
+      };
+
+      const req = createRequest();
+
+      req.user = { sub: expenseStub().userId };
+
+      expense = await expenseController.create(createExpenseDto, req);
+    });
+
+    test('then it should call expenseService', () => {
+      expect(expenseService.create).toBeCalledWith({
+        ...createExpenseDto,
+        userId: expenseStub().userId,
+      });
+    });
+
+    test('then it should return a expense', () => {
+      expect(expense).toEqual(expenseStub());
+    });
+
+    test('then expense should relate to user', () => {
+      expect(expense.userId).toEqual(expenseStub().userId);
     });
   });
 });
