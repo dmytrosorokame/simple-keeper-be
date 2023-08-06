@@ -9,7 +9,7 @@ import { CategoryModule } from './category/category.module';
 import { ConfigModule } from './config/config.module';
 import { getMailConfig } from './configs/mail.config';
 import { ExpenseModule } from './expense/expense.module';
-import { PrismaService } from './prisma.service';
+import { PrismaService } from './prisma/prisma.service';
 import { UserModule } from './user/user.module';
 
 @Module({

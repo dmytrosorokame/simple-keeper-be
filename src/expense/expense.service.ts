@@ -4,7 +4,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { PrismaService } from './../prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
+
 import { CreateExpenseDto, Expense } from './dto/expense.dto';
 
 @Injectable()

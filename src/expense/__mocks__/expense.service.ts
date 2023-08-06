@@ -1,4 +1,4 @@
-import { expenseStub } from '../tests/stubs/expense.stub';
+import { expenseStub } from '../test/stubs/expense.stub';
 
 export const ExpenseService = jest.fn().mockReturnValue({
   create: jest.fn().mockReturnValue(expenseStub()),

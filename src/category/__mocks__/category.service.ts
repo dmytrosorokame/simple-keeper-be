@@ -1,4 +1,4 @@
-import { categoryStub } from '../tests/stubs/category.stub';
+import { categoryStub } from '../test/stubs/category.stub';
 
 export const CategoryService = jest.fn().mockReturnValue({
   getAllByUserId: jest.fn().mockReturnValue([categoryStub()]),
